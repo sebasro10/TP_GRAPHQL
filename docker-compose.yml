@@ -1,19 +1,22 @@
 version: "3.9"
 services:
   movie:
+    container_name: movie_graphql
     build: ./movie/
     ports:
       - "3001:3001"
   showtime:
+    container_name: showtime_graphql
     build: ./showtime/
     ports:
       - "3002:3002"
   booking:
+    container_name: booking_graphql
     build: ./booking/
     ports:
-      - "3003:3003"
+        - "3003:3003"
   user:
+    container_name: user_graphql
     build: ./user/
     ports:
         - "3004:3004"
-
