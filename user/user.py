@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, make_response
+import requests
 import json
 from werkzeug.exceptions import NotFound
 from google.protobuf.json_format import MessageToDict
@@ -7,8 +8,6 @@ import grpc
 from concurrent import futures
 import booking_pb2
 import booking_pb2_grpc
-import movie_pb2
-import movie_pb2_grpc
 
 app = Flask(__name__)
 
@@ -62,11 +61,14 @@ def get_info_movies(userid):
       for date in bookings["dates"]:
          movies= []
          for movieid in date["movies"]:
-            with grpc.insecure_channel('movie_graphql:3001') as channel:
-               stub = movie_pb2_grpc.MovieStub(channel)
-               movie = stub.GetMovieByID(movie_pb2.MovieID(id=movieid))
-               movies.append(MessageToDict(movie))
-            channel.close()
+            query = "query{" + f'movie_with_id(_id:"{movieid}")' + """ {
+                           id
+                           title
+                           rating
+                           director
+                        }
+                     }"""
+            movies.append(requests.post('http://movie_graphql:3001/graphql', json={'query':query}).json()["data"]["movie_with_id"])
          date["movies"] = movies
 
       return make_response(jsonify(bookings),200)

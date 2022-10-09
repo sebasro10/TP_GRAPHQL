@@ -21,7 +21,14 @@ actor = ObjectType('Actor')
 movie.set_field('actors', r.resolve_actors_in_movie)
 query.set_field('actor_with_id', r.actor_with_id)
 
-schema = make_executable_schema(type_defs, movie, query, mutation, actor)
+query.set_field('get_list_movies', r.get_list_movies)
+query.set_field('movie_with_title', r.movie_with_title)
+message = ObjectType('Message')
+mutation.set_field('create_movie', r.create_movie)
+mutation.set_field('delete_movie', r.delete_movie)
+query.set_field('movies_by_director', r.movies_by_director)
+
+schema = make_executable_schema(type_defs, movie, query, mutation, actor, message)
 ###
 
 # root message
@@ -35,7 +42,7 @@ def home():
 @app.route('/graphql', methods=['GET'])
 def playground():
     return PLAYGROUND_HTML, 200
-    
+
 @app.route('/graphql', methods=['POST'])
 def graphql_server():
     data = request.get_json()
